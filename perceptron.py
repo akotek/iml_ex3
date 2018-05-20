@@ -27,23 +27,17 @@ class Perceptron:
 
 
 class Distribution:
+
     @staticmethod
     def classify_with_sign(w, x):
-        return np.sign(np.dot(w, x))  # 1 if > 0, else: -1
+        return np.sign(np.dot(x, w.T))
 
     @staticmethod
     def calc_d1(m, w):
+        sample_pts = np.random.multivariate_normal([0, 0],
+                                                            np.identity(2), m)
 
-        label_pts = []
-        sample_pts = []
-        for i in range(m):
-            pnts_from_random = np.random.multivariate_normal([0, 0],
-                                                             np.identity(2))
-            sample_pts.append(pnts_from_random)
-            label_pts.append(
-                Distribution.classify_with_sign(w, pnts_from_random))
-
-        return sample_pts, label_pts
+        return sample_pts, Distribution.classify_with_sign(w, sample_pts)
 
     @staticmethod
     def get_accuracy(label_set, true_label_set):
@@ -60,19 +54,19 @@ class Distribution:
 def main():
     k = 10000  # == test size
     m_arr = [5, 10, 15, 25, 70]  # == training size
-    w = [0.3, -0.5]
+    w = np.array([0.3, -0.5])
     accuracy = []
     sum_accuracy = 0
 
+    learner = Perceptron()
     for m in m_arr:
 
         for i in range(500):
             d1_training, d1_training_label = Distribution.calc_d1(m, w)
             d1_test, d1_test_label = Distribution.calc_d1(k, w)
 
-            learner = Perceptron()
             learner.fit(d1_training, d1_training_label)
-            learner_test_label = [learner.predict(x) for x in d1_test]
+            learner_test_label = learner.predict(d1_test)
 
             sum_accuracy += Distribution.get_accuracy(learner_test_label, d1_test_label)
 
@@ -86,23 +80,6 @@ def main():
     # print(d1_sample_set)
     # print(d1_training_label)
     clf = svm.SVC(C=1e10, kernel='linear')
-
-
-#    clf.fit()
-
-
-# get_result(50)
-
-def percep_test(X, y):
-    X = [[-2, 4, -1],
-         [4, 1, -1],
-         [1, 6, -1],
-         [2, 4, -1],
-         [6, 2, -1]]
-    y = [-1, -1, 1, 1, 1]
-
-    a = Perceptron()
-    print(a.fit(X, y))
 
 
 if __name__ == '__main__':  main()
