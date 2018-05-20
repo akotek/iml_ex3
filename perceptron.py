@@ -1,14 +1,15 @@
 import numpy as np
 from sklearn import svm
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 
 
 class Perceptron:
+
     def fit(self, X, y):
 
         col_len = len(X[0])  # d
         row_len = len(y)  # m
-
         self.w = np.zeros(shape=(1, col_len))
 
         while True:
@@ -35,51 +36,70 @@ class Distribution:
     @staticmethod
     def calc_d1(m, w):
         sample_pts = np.random.multivariate_normal([0, 0],
-                                                            np.identity(2), m)
+                                                   np.identity(2), m)
 
-        return sample_pts, Distribution.classify_with_sign(w, sample_pts)
+        sample_labels = Distribution.classify_with_sign(w, sample_pts)
+
+        while np.equal(abs(np.sum(sample_labels)), m):
+            sample_pts = np.random.multivariate_normal([0, 0],
+                                                       np.identity(2), m)
+
+            sample_labels = Distribution.classify_with_sign(w, sample_pts)
+        return sample_pts, sample_labels
 
     @staticmethod
-    def get_accuracy(label_set, true_label_set):
-
-        accuracy_sum = 0
-        num_of_labels = len(label_set)
-        for i in range(num_of_labels):
-            if label_set[i] == true_label_set[i]:
-                accuracy_sum += 1
-
-        return accuracy_sum / num_of_labels
+    def get_accuracy(test_labels, predicts):
+        return accuracy_score(test_labels, predicts)
 
 
 def main():
     k = 10000  # == test size
     m_arr = [5, 10, 15, 25, 70]  # == training size
     w = np.array([0.3, -0.5])
-    accuracy = []
-    sum_accuracy = 0
+    accuracy_percp = []
+    accuracy_svm = []
 
-    learner = Perceptron()
+    perceptron_learner = Perceptron()
+    svm_learner = svm.SVC(C=1e10, kernel='linear')
     for m in m_arr:
-
+        sum_accuracy = 0
+        sum_accuracy2 = 0
         for i in range(500):
             d1_training, d1_training_label = Distribution.calc_d1(m, w)
             d1_test, d1_test_label = Distribution.calc_d1(k, w)
 
-            learner.fit(d1_training, d1_training_label)
-            learner_test_label = learner.predict(d1_test)
+            # train percpetron
+            perceptron_learner.fit(d1_training, d1_training_label)  # X,y
+            percep_test_label = perceptron_learner.predict(d1_test)
 
-            sum_accuracy += Distribution.get_accuracy(learner_test_label, d1_test_label)
+            svm_learner.fit(d1_training, d1_training_label)
+            svm_test_label = svm_learner.predict(d1_test)
 
-        accuracy.append(sum_accuracy/k)
+            sum_accuracy += Distribution.get_accuracy(percep_test_label, d1_test_label)
+            sum_accuracy2 += Distribution.get_accuracy(svm_test_label, d1_test_label)
 
-    plt.plot(m_arr, accuracy, label="Perceptron")
+        accuracy_percp.append(sum_accuracy / 500)
+        accuracy_svm.append(sum_accuracy2 / 500)
+
+    plt.plot(m_arr, accuracy_percp, label="Perceptron")
+    plt.plot(m_arr, accuracy_svm, label="SVM")
     plt.legend()
     plt.show()
 
-
     # print(d1_sample_set)
     # print(d1_training_label)
-    clf = svm.SVC(C=1e10, kernel='linear')
+
+
+def perceptron_test1():
+    X = [[-2, 4, -1],
+         [4, 1, -1],
+         [1, 6, -1],
+         [2, 4, -1],
+         [6, 2, -1]]
+    y = [-1, -1, 1, 1, 1]
+
+    a = Perceptron()
+    print(a.fit(X, y))
 
 
 if __name__ == '__main__':  main()
