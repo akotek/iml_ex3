@@ -1,11 +1,10 @@
 import numpy as np
 from sklearn import svm
-import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
 
 
 class Perceptron:
-
     def fit(self, X, y):
 
         col_len = len(X[0])  # d
@@ -28,7 +27,6 @@ class Perceptron:
 
 
 class Distribution:
-
     @staticmethod
     def classify_with_sign(w, x):
         return np.sign(np.dot(x, w.T))
@@ -37,7 +35,6 @@ class Distribution:
     def calc_d1(m, w):
         sample_pts = np.random.multivariate_normal([0, 0],
                                                    np.identity(2), m)
-
         sample_labels = Distribution.classify_with_sign(w, sample_pts)
 
         while np.equal(abs(np.sum(sample_labels)), m):
@@ -52,10 +49,7 @@ class Distribution:
         return accuracy_score(test_labels, predicts)
 
 
-def main():
-    k = 10000  # == test size
-    m_arr = [5, 10, 15, 25, 70]  # == training size
-    w = np.array([0.3, -0.5])
+def train_d1():
     accuracy_percp = []
     accuracy_svm = []
 
@@ -72,22 +66,33 @@ def main():
             perceptron_learner.fit(d1_training, d1_training_label)  # X,y
             percep_test_label = perceptron_learner.predict(d1_test)
 
+            # train svm
             svm_learner.fit(d1_training, d1_training_label)
             svm_test_label = svm_learner.predict(d1_test)
 
-            sum_accuracy += Distribution.get_accuracy(percep_test_label, d1_test_label)
-            sum_accuracy2 += Distribution.get_accuracy(svm_test_label, d1_test_label)
+            sum_accuracy += Distribution.get_accuracy(percep_test_label,
+                                                      d1_test_label)
+            sum_accuracy2 += Distribution.get_accuracy(svm_test_label,
+                                                       d1_test_label)
 
         accuracy_percp.append(sum_accuracy / 500)
         accuracy_svm.append(sum_accuracy2 / 500)
 
+    return accuracy_percp, accuracy_svm
+
+
+# globals:
+k = 10000  # == test size
+m_arr = [5, 10, 15, 25, 70]  # == training size
+w = np.array([0.3, -0.5])
+
+
+def main():
+    accuracy_percp, accuracy_svm = train_d1()
     plt.plot(m_arr, accuracy_percp, label="Perceptron")
     plt.plot(m_arr, accuracy_svm, label="SVM")
     plt.legend()
     plt.show()
-
-    # print(d1_sample_set)
-    # print(d1_training_label)
 
 
 def perceptron_test1():
