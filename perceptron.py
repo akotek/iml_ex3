@@ -47,28 +47,29 @@ def calc_d1(m, w):
 
 
 def calc_d2(m):
-    sample_arr = []
-    label_arr = []
+    sample_arr = [0]*m
+    label_arr = [0]*m
 
     for i in range(m):
         pnt, label = get_rand_pnt_and_label_from_rect()
-        sample_arr.append(pnt)
-        label_arr.append(label)
+        sample_arr[i] = pnt
+        label_arr[i] = label
+
 
     return sample_arr, label_arr
 
 
 def get_rand_pnt_and_label_from_rect():
     random_num = rand.randint(0, 1)
-
-    if random_num == 0:
-        x = rand.randint(-3, 1)
-        y = rand.randint(1, 3)
-        return [x, y], 1
+    if random_num == 1:
+        x = np.random.uniform(-3, 1)
+        y = np.random.uniform(1, 3)
+        label = 1
     else:
-        x = rand.randint(-1, 3)
-        y = rand.randint(-3, -1)
-        return [x, y], -1
+        x = np.random.uniform(-1, 3)
+        y = np.random.uniform(-3, -1)
+        label = -1
+    return np.array([x, y]), label
 
 
 def get_accuracy(test_labels, predicts):
