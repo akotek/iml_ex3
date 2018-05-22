@@ -47,14 +47,13 @@ def calc_d1(m, w):
 
 
 def calc_d2(m):
-    sample_arr = [0]*m
-    label_arr = [0]*m
+    sample_arr = [0] * m
+    label_arr = [0] * m
 
     for i in range(m):
         pnt, label = get_rand_pnt_and_label_from_rect()
         sample_arr[i] = pnt
         label_arr[i] = label
-
 
     return sample_arr, label_arr
 
@@ -130,12 +129,13 @@ def train_d2(perceptron_learner, svm_learner):
             sum_accuracy += get_accuracy(percep_test_label,
                                          d2_test_label)
             sum_accuracy2 += get_accuracy(svm_test_label,
-                                         d2_test_label)
+                                          d2_test_label)
 
         accuracy_percp.append(sum_accuracy / 500)
         accuracy_svm.append(sum_accuracy2 / 500)
 
     return accuracy_percp, accuracy_svm
+
 
 # globals:
 k = 10000  # == test size
@@ -144,7 +144,6 @@ w = np.array([0.3, -0.5])  # w for sign(<w,x>)
 
 
 def main():
-
     perceptron_learner = Perceptron()
     svm_learner = svm.SVC(C=1e10, kernel='linear')
 
@@ -162,6 +161,7 @@ def main():
     plt.plot(m_arr, accuracy_svm, label="SVM")
     plt.legend()
     plt.show()
+
 
 def perceptron_test1():
     X = [[-2, 4, -1],
