@@ -21,7 +21,7 @@ def getNi(i, test_pred, sorted_test_pred):
 
 def main():
     logistic_reg = LogisticRegression()
-    df = pd.read_csv("spam.data", sep=" ")
+    df = pd.read_csv("spam.data", sep=" ", header=None)
 
     train_set, test_set = train_test_split(df, test_size=1000 / df.shape[0])
     train_set_label = train_set.iloc[:, -1].values  # DataFrame > Series > Ndarray
